@@ -1,7 +1,7 @@
 import json
 
 import grpc
-from flask import Flask, abort, jsonify
+from flask import Flask, abort, jsonify, request
 from werkzeug.exceptions import HTTPException
 import event_pb2
 import event_pb2_grpc
@@ -24,6 +24,16 @@ events = event_pb2_grpc.EventServiceStub(grpc.insecure_channel(CONFIG["event_ser
 registrations = registration_pb2_grpc.RegistrationServiceStub(
     grpc.insecure_channel(CONFIG["registration_service"]))
 
+@app.before_request
+def check_staff_auth():
+    protected = (request.method == "POST" and request.path == ("/api/v1/events") or
+    request.method in ("PATCH", "DELETE") and request.path.startswith("/api/v1/events/")
+    )
+    if protected:
+        authorization = request.headers.get("Authorization")
+        expected = f"Bearer {CONFIG['staff_token']}"
+        if expected != authorization:
+          return jsonify(error="Unauthorized"), 401
 
 def fields(message):
     return {field.name: getattr(message, field.name) for field in message.DESCRIPTOR.fields}

@@ -26,13 +26,13 @@ class EventService(rpc.EventServiceServicer):
     def ListEvents(self, request, context):
         if request.name_querry:
             found = read("""SELECT event_id, name, capacity, capacity - seats_taken AS available_seats
-                        FROM events WHERE name LIKE %s ORDER BY event_id""", (request.name_querry,))
+                        FROM events WHERE name LIKE %s ORDER BY event_id""", ("%" + request.name_querry + "%",))
         else:
             found = read("""SELECT event_id, name, capacity, capacity - seats_taken AS available_seats
-                        FROM events ORDER BY event_id""")
+                        FROM events ORDER BY event_id""", ())
         if not found:
             context.abort(grpc.StatusCode.NOT_FOUND, "Event not found")
-        return pb.ListEventsResponse(**found[0])
+        return pb.ListEventsResponse(events = [pb.Event(**event) for event in found])
 
     def GetEvent(self, request, context):
         found = read("""SELECT event_id, name, capacity, capacity - seats_taken AS available_seats

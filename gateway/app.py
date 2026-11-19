@@ -1,7 +1,7 @@
 import json
 
 import grpc
-from flask import Flask, abort, jsonify
+from flask import Flask, abort, jsonify, request
 from werkzeug.exceptions import HTTPException
 import event_pb2
 import event_pb2_grpc
@@ -46,7 +46,7 @@ def list_events():
         response = events.ListEvents(event_pb2.ListEventsRequest(name_querry=name))
     else:
         response = events.ListEvents(event_pb2.ListEventsRequest())
-    return jsonify(fields(response)), 200
+    return jsonify([fields(event) for event in response.events]), 200
     
 
 

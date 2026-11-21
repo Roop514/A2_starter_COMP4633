@@ -6,6 +6,7 @@ service EventService {
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
   rpc GetEvent(EventId) returns (Event);
   rpc ReleaseSeat(EventId) returns (Empty);
+  rpc EditEvent(UpdateEventRequest) returns (UpdateEventResponse);
 }
 
 message ListEventsRequest {optional string name_querry = 1;}
@@ -15,3 +16,5 @@ message ListEventsResponse {
   repeated Event events = 1;
 }
 message Empty {}
+message UpdateEventRequest {int64 event_id = 1; optional string name = 2; optional int32 capacity = 3;}
+message UpdateEventResponse {Event event = 1;}

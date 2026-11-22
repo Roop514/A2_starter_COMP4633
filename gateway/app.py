@@ -57,7 +57,7 @@ def list_events():
     else:
         response = events.ListEvents(event_pb2.ListEventsRequest())
     return jsonify([fields(event) for event in response.events]), 200
-    
+
 
 
 @app.get("/api/v1/events/<int:event_id>")
@@ -72,7 +72,29 @@ def add_event():
 
 @app.patch("/api/v1/events/<int:event_id>")
 def edit_event(event_id):
-    abort(501, "TODO task 2: implement PATCH /api/v1/events/<event_id>")
+    if not request.is_json:
+        return jsonify(error="Request body must be JSON"), 400    
+    body = request.get_json() 
+    if not isinstance(body, dict):
+        return jsonify(error="Request body must be JSON object"), 400
+    if not body:
+        return jsonify(error="Request body cannot be empty"), 400
+    allowed_fields = {"name", "capacity"}
+    if not set(body.keys()).issubset(allowed_fields):
+        return jsonify(error="Invalid Fields"), 400
+    if "name" in body:
+        if not isinstance(body["name"], str):
+            return jsonify(error="Name must be a string"), 400
+    if "capacity" in body:
+        if not isinstance(body["capacity"], int) or body["capacity"] < 0 or isinstance(body["capacity"],bool):
+            return jsonify(error="Capacity must be a non-negative integer"), 400 
+    update_request = event_pb2.UpdateEventRequest(event_id=event_id)
+    if "name" in body:
+        update_request.name = body["name"]
+    if "capacity" in body:
+        update_request.capacity = body["capacity"]
+    update_response = events.EditEvent(update_request) 
+    return jsonify(fields(update_response.event))
 
 
 @app.delete("/api/v1/events/<int:event_id>")

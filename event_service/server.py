@@ -69,6 +69,35 @@ class EventService(rpc.EventServiceServicer):
         write("UPDATE events SET seats_taken = seats_taken - 1 WHERE event_id = %s", (request.event_id,))
         return pb.Empty()
 
+    def EditEvent(self, request, context):
+        event = self.GetEvent(request, context)
+
+        if request.HasField("capacity"):
+            seats_taken = event.capacity - event.available_seats
+            if request.capacity < seats_taken:
+                context.abort(grpc.StatusCode.FAILED_PRECONDITION, "Capacity cannot be less than seats already booked")
+        if request.HasField("name"):
+            updated_name = request.name.strip()
+            if updated_name == "":
+                 context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Event name cannot be blank")
+
+        if request.HasField("name") and request.HasField("capacity"):
+            write("""UPDATE events 
+                 SET name = %s, capacity = %s
+                 WHERE event_id = %s""",(updated_name, request.capacity, request.event_id,)) 
+
+        elif request.HasField("name"):
+            write("""UPDATE events
+                 SET name = %s
+                 WHERE event_id = %s""", (updated_name, request.event_id))
+
+        elif request.HasField("capacity"):
+            write("""UPDATE events
+                 SET capacity = %s
+                 WHERE event_id = %s""", (request.capacity, request.event_id))
+
+        updated_event = self.GetEvent(request, context)
+        return pb.UpdateEventResponse(event = updated_event)
 
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
 rpc.add_EventServiceServicer_to_server(EventService(), server)

@@ -7,14 +7,28 @@ service EventService {
   rpc GetEvent(EventId) returns (Event);
   rpc ReleaseSeat(EventId) returns (Empty);
   rpc EditEvent(UpdateEventRequest) returns (UpdateEventResponse);
+  rpc ReserveSeat(EventId) returns (Empty);
 }
 
-message ListEventsRequest {optional string name_querry = 1;}
-message EventId { int64 event_id = 1; }
-message Event { int64 event_id = 1; string name = 2; int32 capacity = 3; int32 available_seats = 4; }
-message ListEventsResponse {
-  repeated Event events = 1;
+message ListEventsRequest {
+    optional string name_querry = 1;
 }
+
+message EventId {
+    int64 event_id = 1;
+}
+
+message Event {
+    int64 event_id = 1;
+    string name = 2;
+    int32 capacity = 3;
+    int32 available_seats = 4;
+}
+
 message Empty {}
 message UpdateEventRequest {int64 event_id = 1; optional string name = 2; optional int32 capacity = 3;}
 message UpdateEventResponse {Event event = 1;}
+
+message ListEventsResponse {
+    repeated Event events = 1;
+}

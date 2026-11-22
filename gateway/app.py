@@ -67,8 +67,30 @@ def get_event(event_id):
 
 @app.post("/api/v1/events")
 def add_event():
-    abort(501, "TODO task 2: implement POST /api/v1/events")
-
+    if not request.is_json:
+        return jsonify(error="Request body must be JSON"), 400    
+    body = request.get_json() 
+    if not isinstance(body, dict):
+        return jsonify(error="Request body must be JSON object"), 400
+    if not body:
+        return jsonify(error="Request body cannot be empty"), 400
+    required_fields = {"name", "capacity"}
+    if not set(body.keys()).issubset(required_fields):
+        return jsonify(error="Invalid Fields"), 400
+    if "name" not in body:
+        return jsonify(error="Name is required"), 400
+    elif not isinstance(body["name"], str):
+        return jsonify(error="Name must be a string"), 400
+    if "capacity" not in body:
+        return jsonify(error="Capacity is required"), 400
+    elif not isinstance(body["capacity"], int) or body["capacity"] < 0:
+        return jsonify(error="Capacity must be a non-negative integer"), 400 
+    post_request = event_pb2.CreateBookingRequest(name=body["name"], capacity=body["capacity"])
+    create_event_resp = events.CreateEvent(post_request)
+    return jsonify(fields(create_event_resp.event))
+    
+    
+    
 
 @app.patch("/api/v1/events/<int:event_id>")
 def edit_event(event_id):

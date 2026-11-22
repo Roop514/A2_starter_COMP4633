@@ -99,6 +99,17 @@ class EventService(rpc.EventServiceServicer):
         updated_event = self.GetEvent(request, context)
         return pb.UpdateEventResponse(event = updated_event)
 
+    def DeleteEvent(self, request, context):
+        event = self.GetEvent(request, context)
+        seat_taken = event.capacity - event.available_seats
+        if seat_taken > 0:
+            context.abort(grpc.StatusCode.FAILED_PRECONDITION, "Cannot delete an event with existing bookings")
+        write("""DELETE FROM events
+              WHERE event_id = %s""", (request.event_id,))
+        return pb.Empty()
+
+
+
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
 rpc.add_EventServiceServicer_to_server(EventService(), server)
 server.add_insecure_port(CONFIG["listen"])

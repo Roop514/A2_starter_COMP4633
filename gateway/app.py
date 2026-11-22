@@ -73,8 +73,10 @@ def add_event():
 @app.patch("/api/v1/events/<int:event_id>")
 def edit_event(event_id):
     if not request.is_json:
-        return jsonify(error="Request body must be JSON"), 400
+        return jsonify(error="Request body must be JSON"), 400    
     body = request.get_json() 
+    if not isinstance(body, dict):
+        return jsonify(error="Request body must be JSON object"), 400
     if not body:
         return jsonify(error="Request body cannot be empty"), 400
     allowed_fields = {"name", "capacity"}

@@ -24,3 +24,16 @@ message Booking {
     int64 participant_id = 3;
     string participant_name = 4;
 }
+
+message CreateParticipantRequest {
+    string name = 1;
+}
+
+message participant_id {
+    int64 participant_id = 1;
+}
+
+message Participant {
+    int64 participant_id = 1;
+    string name = 2;
+}

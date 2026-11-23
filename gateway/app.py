@@ -83,7 +83,7 @@ def add_event():
         return jsonify(error="Name must be a string"), 400
     if "capacity" not in body:
         return jsonify(error="Capacity is required"), 400
-    elif not isinstance(body["capacity"], int) or body["capacity"] < 0:
+    elif not isinstance(body["capacity"], int) or body["capacity"] < 0 or isinstance(body["capacity"],bool):
         return jsonify(error="Capacity must be a non-negative integer"), 400 
     post_request = event_pb2.CreateEventRequest(name=body["name"], capacity=body["capacity"])
     create_event_resp = events.CreateEvent(post_request)

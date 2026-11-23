@@ -104,8 +104,8 @@ class EventService(rpc.EventServiceServicer):
         capacity = request.capacity
         if not name:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Event name is required and cannot be blank")
-        if not capacity:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Event capacity is required and cannot be blank")
+        if capacity < 0:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Event capacity cannot be negative")
         
         new_event_id = write("""INSERT INTO events
                     (name, capacity) 

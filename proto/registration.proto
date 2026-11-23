@@ -6,6 +6,8 @@ service RegistrationService {
     rpc CancelBooking(BookingId) returns (Empty);
     rpc CreateBooking(CreateBookingRequest) returns (Booking);
     rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse);
+    rpc CreateParticipant(CreateParticipantRequest) returns (Participant);
+    rpc GetParticipant(ParticipantId) returns (Participant);
 }
 
 message BookingId {
@@ -32,4 +34,15 @@ message ListBookingsRequest {
 
 message ListBookingsResponse {
     repeated Booking bookings = 1;
+message CreateParticipantRequest {
+    string name = 1;
+}
+
+message ParticipantId {
+    int64 participant_id = 1;
+}
+
+message Participant {
+    int64 participant_id = 1;
+    string name = 2;
 }

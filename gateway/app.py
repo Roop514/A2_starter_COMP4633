@@ -85,7 +85,7 @@ def add_event():
         return jsonify(error="Capacity is required"), 400
     elif not isinstance(body["capacity"], int) or body["capacity"] < 0:
         return jsonify(error="Capacity must be a non-negative integer"), 400 
-    post_request = event_pb2.CreateBookingRequest(name=body["name"], capacity=body["capacity"])
+    post_request = event_pb2.CreateEventRequest(name=body["name"], capacity=body["capacity"])
     create_event_resp = events.CreateEvent(post_request)
     return jsonify(fields(create_event_resp.event)), 201
     

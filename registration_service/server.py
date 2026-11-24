@@ -101,6 +101,20 @@ class RegistrationService(rpc.RegistrationServiceServicer):
         )
 
         return pb.Booking(**result[0])
+
+    def CreateParticipant(self, request, context):
+        name = request.name.strip()
+        if not name: 
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Participant name must not be blank")
+        participant_id = write("INSERT INTO participants (name) VALUES (%s)", (name,))
+        return self.GetParticipant(pb.ParticipantId(participant_id=participant_id), context)
+
+    def GetParticipant(self, request, context):
+        found = read("SELECT participant_id, name FROM participants WHERE participant_id = %s", (request.participant_id))
+        if not found:
+            context.abort(grpc.StatusCode.NOT_FOUND, "Participant not found")
+        return pb.Participant(**found[0])
+
     def CancelBooking(self, request, context):
         found = read("SELECT event_id, state FROM bookings WHERE booking_id = %s", (request.booking_id,))
         if not found:

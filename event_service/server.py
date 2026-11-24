@@ -108,6 +108,21 @@ class EventService(rpc.EventServiceServicer):
               WHERE event_id = %s AND seats_taken = 0""", (request.event_id,))
         return pb.Empty()
 
+    def CreateEvent(self, request, context):
+        name = request.name.strip()
+        capacity = request.capacity
+        if not name:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Event name is required and cannot be blank")
+        if capacity < 0:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Event capacity cannot be negative")
+        
+        new_event_id = write("""INSERT INTO events
+                    (name, capacity) 
+                    VALUES (%s, %s)""", (name, capacity))
+        
+        if new_event_id:
+            get_event_request = pb.EventId(event_id=new_event_id)
+            return pb.CreateEventResponse(event=self.GetEvent(get_event_request, context))
 
 
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))

@@ -8,6 +8,7 @@ service EventService {
   rpc ReleaseSeat(EventId) returns (Empty);
   rpc EditEvent(UpdateEventRequest) returns (UpdateEventResponse);
   rpc ReserveSeat(EventId) returns (Empty);
+  rpc DeleteEvent(EventId) returns (Empty);
   rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
 }
 

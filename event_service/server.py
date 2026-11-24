@@ -105,7 +105,7 @@ class EventService(rpc.EventServiceServicer):
         if seat_taken > 0:
             context.abort(grpc.StatusCode.FAILED_PRECONDITION, "Cannot delete an event with existing bookings")
         write("""DELETE FROM events
-              WHERE event_id = %s""", (request.event_id,))
+              WHERE event_id = %s AND seats_taken = 0""", (request.event_id,))
         return pb.Empty()
 
 

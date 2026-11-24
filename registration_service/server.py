@@ -54,7 +54,7 @@ class RegistrationService(rpc.RegistrationServiceServicer):
                WHERE event_id = %s
                AND participant_id = %s
                AND state = 'confirmed'""",
-            (request.event_id, request.participant_id)
+            (request.event_id, request.participant_id,)
         )
 
         if existing:
@@ -110,7 +110,7 @@ class RegistrationService(rpc.RegistrationServiceServicer):
         return self.GetParticipant(pb.ParticipantId(participant_id=participant_id), context)
 
     def GetParticipant(self, request, context):
-        found = read("SELECT participant_id, name FROM participants WHERE participant_id = %s", (request.participant_id))
+        found = read("SELECT participant_id, name FROM participants WHERE participant_id = %s", (request.participant_id,))
         if not found:
             context.abort(grpc.StatusCode.NOT_FOUND, "Participant not found")
         return pb.Participant(**found[0])

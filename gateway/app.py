@@ -117,9 +117,11 @@ def add_participant():
 
 @app.get("/api/v1/participants/<int:participant_id>")
 def get_participant(participant_id):
+    if participant_id <= 0:
+        abort(400, "id must be a positive integer")
     participant = registrations.GetParticipant(
         registration_pb2.ParticipantId(participant_id=participant_id))
-    return jsonify(fields(participant))
+    return jsonify(fields(participant)), 200
 
 
 @app.get("/api/v1/events/<int:event_id>/registrations")

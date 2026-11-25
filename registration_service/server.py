@@ -123,7 +123,24 @@ class RegistrationService(rpc.RegistrationServiceServicer):
             write("UPDATE bookings SET state = 'cancelled' WHERE booking_id = %s", (request.booking_id,))
             call(self.events.ReleaseSeat, event_pb2.EventId(event_id=found[0]["event_id"]), context)
         return pb.Empty()
+    
+    def ListBookings(self, request, context):
+        found = read(
+            """SELECT b.booking_id, b.event_id,
+                    b.participant_id,
+                    p.name AS participant_name
+            FROM bookings b
+            JOIN participants p
+                ON b.participant_id = p.participant_id
+            WHERE b.event_id = %s
+                AND b.state = 'confirmed'
+            ORDER BY b.booking_id""",
+            (request.event_id,)
+        )
 
+        return pb.ListBookingsResponse(
+            bookings=[pb.Booking(**booking) for booking in found]
+        )
 
 events = event_pb2_grpc.EventServiceStub(grpc.insecure_channel(CONFIG["event_service"]))
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))

@@ -34,6 +34,7 @@ message ListBookingsRequest {
 
 message ListBookingsResponse {
     repeated Booking bookings = 1;
+}
 message CreateParticipantRequest {
     string name = 1;
 }

@@ -8,6 +8,8 @@ service EventService {
   rpc ReleaseSeat(EventId) returns (Empty);
   rpc EditEvent(UpdateEventRequest) returns (UpdateEventResponse);
   rpc ReserveSeat(EventId) returns (Empty);
+  rpc DeleteEvent(EventId) returns (Empty);
+  rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
 }
 
 message ListEventsRequest {
@@ -28,6 +30,9 @@ message Event {
 message Empty {}
 message UpdateEventRequest {int64 event_id = 1; optional string name = 2; optional int32 capacity = 3;}
 message UpdateEventResponse {Event event = 1;}
+
+message CreateEventRequest {string name = 1; int32 capacity = 2;}
+message CreateEventResponse {Event event = 1;}
 
 message ListEventsResponse {
     repeated Event events = 1;

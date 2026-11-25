@@ -114,6 +114,9 @@ def get_participant(participant_id):
 
 @app.get("/api/v1/events/<int:event_id>/registrations")
 def list_bookings(event_id):
+    if event_id <= 0:
+        abort(400, "event_id must be a positive integer")
+        
     response = registrations.ListBookings(
         registration_pb2.ListBookingsRequest(
             event_id=event_id
